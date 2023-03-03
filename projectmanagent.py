@@ -22,6 +22,7 @@ def add_task():
     if task_name == '' or task_description == '' or start_date == '' or end_date == '' or assigned_to == '' or status == '':
         messagebox.showerror('Please fill all the fields to add task.')
         
+    
     global tasks_df
     tasks_df = pd.concat([tasks_df, new_task], ignore_index=True)
     tasks_df.to_csv('tasks.csv', index=False) # save the tasks to a CSV file
@@ -47,14 +48,17 @@ def update_table():
     tasks_table.delete(*tasks_table.get_children())
     for i, row in tasks_df.iterrows():
         tasks_table.insert("", tk.END, values=(i+1, row['Task Name'], row['Task Description'], row['Start Date'], row['End Date'], row['Assigned To'], row['Status']))
-        delete_button = tk.Button(tasks_table, text='Delete', command=lambda i=i: delete_task(i))
-        tasks_table.create_window(tasks_table.index(0, 0, root=delete_button, padx=2, pady=2))
+        delete_button = tk.Button(tasks_table, text='Delete', command=lambda i=i: delete_task(tasks=i, task_id=tasks_df.at[i, 'id']))
+        delete_button.place(x=100, y=100)
+        # tasks_table.insert("", tk.END, values=(i+1, row['Task Name'], row['Task Description'], row['Start Date'], row['End Date'], row['Assigned To'], row['Status'], delete_button))
 
-def delete_task(index):
-    global tasks_df
-    tasks_df = tasks_df.drop(index=index)
-    tasks_df.reset_index(drop=True, inplace=True)
-    update_table()
+def delete_task(task_id, tasks):
+    for task in tasks:
+        if task['id'] == task_id:
+            tasks.remove(task)
+            return True
+    return False
+
 
 # Create a GUI for the project management app
 root = tk.Tk()
@@ -125,7 +129,6 @@ status_entry.grid(row=5, column=1)
 add_task_button.grid(row=6, column=1)
 tasks_table.grid(row=7, columnspan=2)
 update_status_button.grid(row=8, column=1)
-# delete_button.grid(row=8, column=2)
 sort_by_start_date_button.grid(row=8, column=0)
 canvas.get_tk_widget().grid(row=9, columnspan=2)
 
