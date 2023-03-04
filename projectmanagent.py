@@ -50,14 +50,13 @@ def update_table():
         tasks_table.insert("", tk.END, values=(i+1, row['Task Name'], row['Task Description'], row['Start Date'], row['End Date'], row['Assigned To'], row['Status']))
         delete_button = tk.Button(tasks_table, text='Delete', command=lambda i=i: delete_task(tasks=i, task_id=tasks_df.at[i, 'id']))
         delete_button.place(x=100, y=100)
-        # tasks_table.insert("", tk.END, values=(i+1, row['Task Name'], row['Task Description'], row['Start Date'], row['End Date'], row['Assigned To'], row['Status'], delete_button))
+        tasks_table.insert("", tk.END, values=(i+1, row['Task Name'], row['Task Description'], row['Start Date'], row['End Date'], row['Assigned To'], row['Status'], delete_button))
 
-def delete_task(task_id, tasks):
-    for task in tasks:
-        if task['id'] == task_id:
-            tasks.remove(task)
-            return True
-    return False
+# Create a function to delete tasks
+def delete_task(tasks, task_id):
+    tasks_df.drop(task_id, inplace=True)
+    tasks_df.to_csv('tasks.csv', index=False) # save the tasks to a CSV file
+    update_table()
 
 
 # Create a GUI for the project management app
